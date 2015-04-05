@@ -4,13 +4,7 @@ import jdk.nashorn.internal.runtime.regexp.joni.EncodingHelper;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.both;
-import static org.junit.matchers.JUnitMatchers.containsString;
-import static org.junit.matchers.JUnitMatchers.everyItem;
-import static org.junit.matchers.JUnitMatchers.hasItems;
+
 
 /**
  * Created by Nate on 4/4/15.
