@@ -47,11 +47,15 @@ public class EncodingHelperCharTest {
 
     @Test
     public void testToUtf8String() throws Exception {
-
+        EncodingHelperChar thing = new EncodingHelperChar('é');
+        String correct = "\\xC3\\xA9";
+        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct , thing.toUtf8String());
     }
 
     @Test
     public void testGetCharacterName() throws Exception {
-
+        EncodingHelperChar thing = new EncodingHelperChar('é');
+        String correct = "LATIN SMALL LETTER E WITH ACUTE";
+        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct , thing.getCharacterName());
     }
 }
