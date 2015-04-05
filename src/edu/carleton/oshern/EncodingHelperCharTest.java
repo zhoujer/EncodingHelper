@@ -14,8 +14,12 @@ import static org.junit.matchers.JUnitMatchers.hasItems;
 
 /**
  * Created by Nate on 4/4/15.
+ * A series of tests for the EncodingHelperChar class
+ * By Nate Osher and Jerry Zhou
  */
 public class EncodingHelperCharTest {
+
+    // CONSTRUCTOR TESTS
 
     @Test
     public void testIntConstructorShouldWork() throws Exception{
@@ -35,6 +39,8 @@ public class EncodingHelperCharTest {
         org.junit.Assert.assertNotNull("Failure- Constructor failed to create instance of EncodingHelperChar - char constructor", thing);
     }
 
+    // GETTER/SETTER TESTS
+
     @Test
     public void testGetCodePointShouldNotReturnNull() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar(42);
@@ -53,6 +59,8 @@ public class EncodingHelperCharTest {
         thing.setCodePoint(0x42);
         org.junit.Assert.assertEquals("Failure- values should be equal", 0x42, thing.getCodePoint());
     }
+
+    // EVERYTHING ELSE
 
     @Test
     public void testToUtf8BytesShouldReturnCorrectValues() throws Exception {
