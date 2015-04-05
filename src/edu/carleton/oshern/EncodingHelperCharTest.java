@@ -27,35 +27,57 @@ public class EncodingHelperCharTest {
     @Test
     public void testSetCodePointShouldChangeValue() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar(null);
-        thing.setCodePoint(42);
-        org.junit.Assert.assertEquals("Failure- should return true", 42, thing.getCodePoint());
+        thing.setCodePoint(0x42);
+        org.junit.Assert.assertEquals("Failure- should return true", 0x42, thing.getCodePoint());
     }
 
     @Test
     public void testToUtf8BytesShouldReturnCorrectValues() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar('A');
-        byte[] actual = new byte[42];
-        org.junit.Assert.assertArrayEquals("Failure- byte arrays are not the same", actual, thing.toUtf8Bytes());
+        byte[] expected = new byte[10];
+        expected[0] = 0x41;
+        org.junit.Assert.assertArrayEquals("Failure- byte arrays are not the same", expected, thing.toUtf8Bytes());
+    }
+
+    @Test
+    public void testToUtf8BytesShouldNotReturnNull() throws Exception {
+        EncodingHelperChar thing = new EncodingHelperChar('A');
+        org.junit.Assert.assertNotNull("Failure- byte array was empty", thing.toUtf8Bytes());
     }
 
     @Test
     public void testToCodePointStringShouldReturnCorrectString() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar('Ꮬ');
-        String correct = "\\x13\\xDC";
-        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct , thing.toCodePointString());
+        String correct = "U+13DC";
+        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct, thing.toCodePointString());
     }
 
     @Test
-    public void testToUtf8String() throws Exception {
+    public void testToUtf8StringShouldReturnCorrectString() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar('é');
         String correct = "\\xC3\\xA9";
         org.junit.Assert.assertSame("Failure- string returned was not expected string", correct , thing.toUtf8String());
     }
 
     @Test
-    public void testGetCharacterName() throws Exception {
+    public void testToUtf8StringShouldNotReturnEmptyString() throws Exception {
+        EncodingHelperChar thing = new EncodingHelperChar('é');
+        String wrong = "";
+        org.junit.Assert.assertNotSame("Failure- method returned empty string", wrong, thing.toUtf8String());
+    }
+
+    @Test
+    public void testGetCharacterNameShouldReturnCorrectName() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar('é');
         String correct = "LATIN SMALL LETTER E WITH ACUTE";
-        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct , thing.getCharacterName());
+        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct, thing.getCharacterName());
+    }
+
+    @Test
+    public void testGetCharacterNameShouldNotReturnEmptyString() throws Exception {
+        EncodingHelperChar thing = new EncodingHelperChar('é');
+        String wrong = "";
+        org.junit.Assert.assertNotSame("Failure- method returned empty string", wrong, thing.getCharacterName());
     }
 }
+
