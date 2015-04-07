@@ -1,4 +1,6 @@
 package edu.carleton.oshern;
+import java.io.*;
+import java.util.*;
 
 /**
  * The main model class for the EncodingHelper project in
@@ -14,11 +16,12 @@ public class EncodingHelperChar {
     }
     
     public EncodingHelperChar(byte[] utf8Bytes) {
-        // Not yet implemented.
+        // Not yet implemented
     }
     
     public EncodingHelperChar(char ch) {
-        // Not yet implemented.
+        this.codePoint = ch;
+        // System.out.println(Integer.toString(this.codePoint));
     }
     
     public int getCodePoint() {
@@ -39,7 +42,7 @@ public class EncodingHelperChar {
      * @return the UTF-8 byte array for this character
      */
     public byte[] toUtf8Bytes() {
-        // Not yet implemented.
+
         return null;
     }
     
@@ -53,8 +56,15 @@ public class EncodingHelperChar {
      * @return the U+ string for this character
      */
     public String toCodePointString() {
-        // Not yet implemented.
-        return "";
+        String hexString = Integer.toHexString(this.codePoint);
+        if (hexString.length() == 2){
+            hexString = "00" + hexString;
+        } else if (hexString.length() == 3){
+            hexString = "0" + hexString;
+        }
+        hexString = "U+" + hexString;
+        // System.out.println(hexString);
+        return hexString.toUpperCase();
     }
     
     /**
@@ -81,7 +91,32 @@ public class EncodingHelperChar {
      * @return this character's Unicode name
      */
     public String getCharacterName() {
-        // Not yet implemented.
-        return "";
+        String codePointString = this.toCodePointString();
+        codePointString = codePointString.substring(2).toUpperCase();
+        // System.out.println(codePointString);
+        int codeLength = codePointString.length();
+        String name = null;
+        File file = new File ("/Users/Nate/documents/projects/EncodingHelper/src/edu/carleton/oshern/unicode.txt");
+        try{
+            Scanner scan = new Scanner (file);
+            while (scan.hasNextLine() == true){
+                String line = scan.nextLine();
+                // System.out.println(line.substring(0, codeLength));
+                if (line.substring(0, codeLength).equals(codePointString)) {
+                    String[] pieces = line.split(";");
+                    // System.out.println(Arrays.toString(pieces));
+                    name = pieces[1];
+                }
+
+            }
+        }
+        catch(FileNotFoundException ex){
+            System.out.println("Error- file not found");
+        }
+        if (name != null){
+            return name;
+        } else {
+            return "Error- name not found";
+        }
     }
 }

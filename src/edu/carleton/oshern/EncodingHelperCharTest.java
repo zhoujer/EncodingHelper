@@ -73,9 +73,9 @@ public class EncodingHelperCharTest {
 
     @Test
     public void testToCodePointStringShouldReturnCorrectString() throws Exception {
-        EncodingHelperChar thing = new EncodingHelperChar('Ꮬ');
-        String correct = "U+13DC";
-        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct, thing.toCodePointString());
+        EncodingHelperChar thing = new EncodingHelperChar('!');
+        String correct = "U+0021";
+        org.junit.Assert.assertEquals("Failure- string returned was not expected string", correct, thing.toCodePointString());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class EncodingHelperCharTest {
     public void testGetCharacterNameShouldReturnCorrectName() throws Exception {
         EncodingHelperChar thing = new EncodingHelperChar('é');
         String correct = "LATIN SMALL LETTER E WITH ACUTE";
-        org.junit.Assert.assertSame("Failure- string returned was not expected string", correct, thing.getCharacterName());
+        org.junit.Assert.assertEquals("Failure- string returned was not expected string", correct, thing.getCharacterName());
     }
 
     @Test
