@@ -23,7 +23,7 @@ public class EncodingHelperCharTest {
 
     @Test
     public void testUtf8ConstructorShouldWork() throws Exception{
-        EncodingHelperChar thing = new EncodingHelperChar(new byte[]{(byte) 0xC3,(byte) 0xA9 });
+        EncodingHelperChar thing = new EncodingHelperChar(new byte[]{(byte) 0xF0,(byte) 0x90, (byte) 0x8D, (byte) 0x88 });
         org.junit.Assert.assertNotNull("Failure- Constructor failed to create instance of EncodingHelperChar - byte constructor", thing);
     }
 

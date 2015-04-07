@@ -16,7 +16,32 @@ public class EncodingHelperChar {
     }
     
     public EncodingHelperChar(byte[] utf8Bytes) {
-        // Not yet implemented
+        String utf8String = "";
+        for (int i = 0; i < utf8Bytes.length; i++){
+            utf8String += String.format("%8s", Integer.toBinaryString(utf8Bytes[i] & 0xFF)).replace(' ', '0');
+        }
+        // System.out.println(utf8String);
+        if (utf8String.length() == 8){
+            utf8String = utf8String;
+        }else if(utf8String.length() == 16){
+            utf8String = utf8String.substring(3, 8) + utf8String.substring(10);
+        }else if(utf8String.length() == 24){
+            utf8String = utf8String.substring(4, 8) + utf8String.substring(10, 16) + utf8String.substring(18);
+        }else if(utf8String.length() == 32){
+            utf8String = utf8String.substring(5, 8) + utf8String.substring(10, 16) + utf8String.substring(18, 24) +
+                    utf8String.substring(26);
+        }else if(utf8String.length() == 40){
+            utf8String = utf8String.substring(6, 8) + utf8String.substring(10, 16) + utf8String.substring(18, 24) +
+                    utf8String.substring(26, 32) + utf8String.substring(34);
+        }else if(utf8String.length() == 48){
+            utf8String = utf8String.substring(6, 8) + utf8String.substring(10, 16) + utf8String.substring(18, 24) +
+                    utf8String.substring(26, 32) + utf8String.substring(34, 40) +
+                    utf8String.substring(42);
+        }else{
+            System.out.println("Error- bytes not in UTF-8 format");
+        }
+        this.codePoint = Integer.parseInt(utf8String, 2);
+        // System.out.println(this.codePoint);
     }
     
     public EncodingHelperChar(char ch) {
@@ -116,7 +141,7 @@ public class EncodingHelperChar {
         if (name != null){
             return name;
         } else {
-            return "Error- name not found";
+            return "Error- character name not found";
         }
     }
 }
