@@ -12,36 +12,59 @@ public class EncodingHelperChar {
     private int codePoint;
 
     public EncodingHelperChar(int codePoint) {
-        this.codePoint = codePoint;
+        if ( codePoint > 1114111 | codePoint < 0) {
+            throw new IllegalArgumentException("Error- codepoint input is " +
+                    "either too large or too small");
+        }else{
+            this.codePoint = codePoint;
+        }
     }
     
     public EncodingHelperChar(byte[] utf8Bytes) {
-        String utf8String = "";
-        for (int i = 0; i < utf8Bytes.length; i++){
-            utf8String += String.format("%8s", Integer.toBinaryString(utf8Bytes[i] & 0xFF)).replace(' ', '0');
+        if (utf8Bytes.length > 4){
+            throw new IllegalArgumentException("Error- UTF-8 encodings cannot" +
+                    " be longer than 4 bytes");
         }
-        // System.out.println(utf8String);
-        if (utf8String.length() == 8){
-            utf8String = utf8String;
-        }else if(utf8String.length() == 16){
-            utf8String = utf8String.substring(3, 8) + utf8String.substring(10);
-        }else if(utf8String.length() == 24){
-            utf8String = utf8String.substring(4, 8) + utf8String.substring(10, 16) + utf8String.substring(18);
-        }else if(utf8String.length() == 32){
-            utf8String = utf8String.substring(5, 8) + utf8String.substring(10, 16) + utf8String.substring(18, 24) +
-                    utf8String.substring(26);
-        }else if(utf8String.length() == 40){
-            utf8String = utf8String.substring(6, 8) + utf8String.substring(10, 16) + utf8String.substring(18, 24) +
-                    utf8String.substring(26, 32) + utf8String.substring(34);
-        }else if(utf8String.length() == 48){
-            utf8String = utf8String.substring(6, 8) + utf8String.substring(10, 16) + utf8String.substring(18, 24) +
-                    utf8String.substring(26, 32) + utf8String.substring(34, 40) +
-                    utf8String.substring(42);
-        }else{
-            System.out.println("Error- bytes not in UTF-8 format");
+        
+        if (utf8Bytes.length == 1){
+            this.codePoint = utf8Bytes[0];
+            // System.out.println(Integer.toString(this.getCodePoint()));
+        }else if (utf8Bytes.length == 2){
+            utf8Bytes[0] = (byte) (utf8Bytes[0] & 0x1F);
+            utf8Bytes[1] = (byte) ((utf8Bytes[1] & 0x3F) | (utf8Bytes[0] << 6));
+            utf8Bytes[0] = (byte) (utf8Bytes[0] >> 2);
+            this.setCodePoint(Byte.toUnsignedInt(utf8Bytes[0]) << 6);
+            this.setCodePoint(this.getCodePoint() |
+                    (Byte.toUnsignedInt(utf8Bytes[1])));
+            // System.out.println(Integer.toString(this.getCodePoint()));
+
+        }else if (utf8Bytes.length == 3){
+            utf8Bytes[0] = (byte) (utf8Bytes[0] & 0x0F);
+            utf8Bytes[1] = (byte) (utf8Bytes[1] & 0x3F);
+            utf8Bytes[2] = (byte) (utf8Bytes[2] & 0x3F);
+            this.setCodePoint(Byte.toUnsignedInt(utf8Bytes[0]) << 12);
+            this.setCodePoint(this.getCodePoint() |
+                    (Byte.toUnsignedInt(utf8Bytes[1]) << 6));
+            this.setCodePoint(this.getCodePoint() |
+                    (Byte.toUnsignedInt(utf8Bytes[2])));
+            // System.out.println(Integer.toString(this.getCodePoint()));
+
+
+        }else if (utf8Bytes.length == 4){
+            utf8Bytes[0] = (byte) (utf8Bytes[0] & 0x07);
+            utf8Bytes[1] = (byte) (utf8Bytes[1] & 0x3F);
+            utf8Bytes[2] = (byte) (utf8Bytes[2] & 0x3F);
+            utf8Bytes[3] = (byte) (utf8Bytes[3] & 0x3F);
+            this.setCodePoint(Byte.toUnsignedInt(utf8Bytes[0]) << 18);
+            this.setCodePoint(this.getCodePoint() |
+                    (Byte.toUnsignedInt(utf8Bytes[1]) << 12));
+            this.setCodePoint(this.getCodePoint() |
+                    (Byte.toUnsignedInt(utf8Bytes[2]) << 6));
+            this.setCodePoint(this.getCodePoint() |
+                    (Byte.toUnsignedInt(utf8Bytes[3])));
+            // System.out.println(Integer.toString(this.getCodePoint()));
         }
-        this.codePoint = Integer.parseInt(utf8String, 2);
-        // System.out.println(this.codePoint);
+
     }
     
     public EncodingHelperChar(char ch) {
@@ -66,9 +89,50 @@ public class EncodingHelperChar {
      * 
      * @return the UTF-8 byte array for this character
      */
-    public byte[] toUtf8Bytes() {
 
-        return null;
+    public byte[] toUtf8Bytes() {
+        //long unsignedInt = -1 & this.getCodePoint();
+        int cp = this.getCodePoint();
+        byte cpByte = (byte) cp;
+        //System.out.println("CodePoint (hex) : " +
+        // Integer.toHexString(cp) + " (dec) : " + cp);
+
+
+        byte[] byteArray = null;
+
+        if ( cp <  0x0080){
+            byteArray =  new byte[]{ (byte) cp};
+            //System.out.println("byte[] length should be 1");
+        }
+        else if (cp <  0x0800){
+            byteArray = new byte[2];
+            byte byte1 = (byte) ((cp >>6) & 0x001F | 0xFFC0 );
+            byte byte2 = (byte)(cp & 0x003F | 0x80 );
+            //System.out.println("byte[] length should be 2");
+            byteArray =  new byte[]{ byte1 , byte2 };
+        }
+        else if (cp <  0x10000){
+            byteArray = new byte[3];
+            byte byte1 = (byte) ((cp >>12) & 0x000F | 0x00E0 );
+            byte byte2 = (byte) ((cp >>6) & 0x003F | 0x0080 );
+            byte byte3 = (byte) (cp & 0x003F | 0x0080 );
+            // System.out.println("byte[] length should be 3");
+            byteArray =  new byte[]{ byte1 , byte2, byte3 };
+        }
+        else if (cp < 0x110000)  {
+            byteArray = new byte[4];
+            byte byte1 = (byte) ((cp >>18) & 0x0007 | 0x00F0 );
+            byte byte2 = (byte) ((cp >>12) & 0x003F | 0x0080 );
+            byte byte3 = (byte) ((cp >>6) & 0x003F | 0x0080 );
+            byte byte4 = (byte) (cp & 0x003F | 0x0080 );
+            // System.out.println("byte[] length should be 4");
+            byteArray =  new byte[]{ byte1 , byte2, byte3, byte4};
+        } else {
+            System.out.println("Error - Code point not within U+0000 to " +
+                    "U+110000: Returning byte array as null ");
+        }
+        //System.out.println("ByteArray: "  + Arrays.toString(byteArray));
+        return byteArray;
     }
     
     /**
@@ -82,7 +146,9 @@ public class EncodingHelperChar {
      */
     public String toCodePointString() {
         String hexString = Integer.toHexString(this.codePoint);
-        if (hexString.length() == 2){
+        if (hexString.length() == 1){
+            hexString = "000" + hexString;
+        }else if (hexString.length() == 2){
             hexString = "00" + hexString;
         } else if (hexString.length() == 3){
             hexString = "0" + hexString;
@@ -103,8 +169,12 @@ public class EncodingHelperChar {
      * @return the escaped hexadecimal byte string
      */
     public String toUtf8String() {
-        // Not yet implemented.
-        return "";
+        byte[] byteHolder = this.toUtf8Bytes();
+        String utf8String = "";
+        for (int i = 0; i < byteHolder.length; i++){
+            utf8String += String.format("\\x%02X", byteHolder[i]);
+        }
+        return utf8String;
     }
     
     /**
@@ -118,10 +188,11 @@ public class EncodingHelperChar {
     public String getCharacterName() {
         String codePointString = this.toCodePointString();
         codePointString = codePointString.substring(2).toUpperCase();
+        // codePointString = "0015";
         // System.out.println(codePointString);
         int codeLength = codePointString.length();
         String name = null;
-        File file = new File ("/Users/Nate/documents/projects/EncodingHelper/src/edu/carleton/oshern/unicode.txt");
+        File file = new File("src/edu/carleton/oshern/unicode.txt");
         try{
             Scanner scan = new Scanner (file);
             while (scan.hasNextLine() == true){
@@ -130,7 +201,12 @@ public class EncodingHelperChar {
                 if (line.substring(0, codeLength).equals(codePointString)) {
                     String[] pieces = line.split(";");
                     // System.out.println(Arrays.toString(pieces));
-                    name = pieces[1];
+                    if (pieces[1].equals("<control>")){
+                        name = pieces[1] + " " + pieces[10];
+                        // System.out.println(name);
+                    }else{
+                        name = pieces[1];
+                    }
                 }
 
             }
