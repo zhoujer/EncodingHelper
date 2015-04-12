@@ -1,4 +1,4 @@
-package edu.carleton.oshern;
+//package edu.carleton.oshern;
 import java.io.*;
 import java.util.*;
 
@@ -13,8 +13,9 @@ public class EncodingHelperChar {
 
     public EncodingHelperChar(int codePoint) {
         if ( codePoint > 1114111 | codePoint < 0) {
-            throw new IllegalArgumentException("Error- codepoint input is " +
-                    "either too large or too small");
+            System.out.println(errorMsg("codepointsize"));
+            //throw new IllegalArgumentException("Error- codepoint input is " +
+                    //"either too large or too small")
         }else{
             this.codePoint = codePoint;
         }
@@ -22,8 +23,9 @@ public class EncodingHelperChar {
     
     public EncodingHelperChar(byte[] utf8Bytes) {
         if (utf8Bytes.length > 4){
-            throw new IllegalArgumentException("Error- UTF-8 encodings cannot" +
-                    " be longer than 4 bytes");
+            System.out.println(errorMsg("bytearray"));
+            //throw new IllegalArgumentException("Error- UTF-8 encodings cannot" +
+                    //" be longer than 4 bytes");
         }
         
         if (utf8Bytes.length == 1){
@@ -218,6 +220,21 @@ public class EncodingHelperChar {
             return name;
         } else {
             return "Error- character name not found";
+        }
+    }
+    public static String errorMsg (String err){
+        if (err.equals("codepointsize")){
+            return "Error- codepoint input is " +
+            "either too large or too small";
+
+        }else if (err.equals("bytearray")){
+            return "Error- byte array not valid UTf-8 encoding ";
+
+        }else if (err.equals("unknown")){
+            return "Unknown Error";
+
+        }else{
+            return "Incorrect Error Message ";
         }
     }
 }

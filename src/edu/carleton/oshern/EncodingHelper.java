@@ -51,7 +51,8 @@ public class EncodingHelper {
                     processor(inputType, outputType, data);
                 }
             }else{
-                // System.out.println("Oops");
+                String error = errorMsg("arg");
+                System.out.println(error);
             }
         }
     }
@@ -91,6 +92,8 @@ public class EncodingHelper {
             System.out.println(sumChar.toCodePointString());
         }else if(k.equals("u8")){
             System.out.println(sumChar.toUtf8String());
+        }else{
+
         }
     }
 
@@ -136,17 +139,18 @@ public class EncodingHelper {
     public static void processor(String in, String out, ArrayList d){
         // System.out.println(in + " " + out);
         if(in.equals("string") || in.equals("none")){
-            stringSubProcessor(d, out);
+            stringOutProcessor(d, out);
         }else if(in.equals("utf8")){
-            utf8SubProcessor(d, out);
+            utf8OutProcessor(d, out);
         }else if(in.equals("codepoint")){
-            codepointSubProcessor(d, out);
+            codepointOutProcessor(d, out);
         }else{
-            // ERROR MESSAGE
+            String error = errorMsg("inputType");
+            System.out.println(error);
         }
     }
 
-    public static void stringSubProcessor(ArrayList lst, String o){
+    public static void stringOutProcessor(ArrayList lst, String o){
         if(o.equals("none")){
             if (lst.get(0).toString().length() == 1){
                 char theChar = lst.get(0).toString().charAt(0);
@@ -170,11 +174,12 @@ public class EncodingHelper {
                 stringSummary(lst.get(0).toString(), "cdp");
             }
         }else{
-            // System.out.println("Fuck");
+            String error = errorMsg("outputType");
+            System.out.println(error);
         }
     }
 
-    public static void utf8SubProcessor(ArrayList lst, String o){
+    public static void utf8OutProcessor(ArrayList lst, String o){
         String byteString = lst.get(0).toString();
         // System.out.println(byteString);
         byte[] byteArray = new byte[byteString.length() / 4];
@@ -258,6 +263,9 @@ public class EncodingHelper {
                 }
                 System.out.println(finalString);
             }
+        }else{
+            String error = errorMsg("outputType");
+            System.out.println(error);
         }
     }
 
@@ -297,7 +305,7 @@ public class EncodingHelper {
         return doubleArray;
     }
 
-    public static void codepointSubProcessor(ArrayList lst, String o){
+    public static void codepointOutProcessor(ArrayList lst, String o){
         String cpArray[] = cpArrayGetter(lst);
         if(o.equals("none")){
             if(cpArray.length == 1){
@@ -324,6 +332,7 @@ public class EncodingHelper {
                 System.out.println("UTF-8: " + finalUTF8);
             }
         }else if(o.equals("utf8")){
+
             if(cpArray.length == 1){
                 int theCp = Integer.parseInt(cpArray[0].substring(2), 16);
                 EncodingHelperChar theCpEH = new EncodingHelperChar(theCp);
@@ -350,6 +359,9 @@ public class EncodingHelper {
                 finalString += Character.toString((char) theCp);
             }
             System.out.println(finalString);
+        } else{
+            String error = errorMsg("outputType");
+            System.out.println(error);
         }
     }
 
@@ -364,6 +376,41 @@ public class EncodingHelper {
             }
         }
         return cpArray;
+    }
+
+    public static String errorMsg (String err){
+        if (err.equals("inputArg")){
+            return "Error - Incorrect input argument. Use: -i or --input" +
+                    "\n Use -h on command line for help";
+
+        }else if (err.equals("inputType")) {
+            return "Error - Incorrect input type. " +
+                    "\n Correct types: [codepoint, utf8, or string]"+
+                    "\n Use -h on command line for help";
+
+        }else if (err.equals("outputArg")){
+            return "Error - Incorrect output argument. Use: -i or --input"+
+                    "\n Use -h on command line for help";
+
+        }else if (err.equals("outputType")){
+            return "Error - Incorrect output type. " +
+                    "\n Correct types: [codepoint, utf8, or string]"+
+                    "\n Use -h on command line for help";
+
+        }else if (err.equals("arg")){
+            return "Error - Incorrect input arguments. " +
+                    "\n To specify input: Use [-i or --input] followed by " +
+                    "[utf8, string, or codepoint ]" +
+                    "\n To specify output: Use [-o or --output] followed by " +
+                    "[utf8, string, or codepoint ]" +
+                    "\n Use -h for help";
+
+        }else if (err.equals("unknown")){
+            return "Unknown Error";
+
+        }else{
+            return "Incorrect Error Message ";
+        }
     }
 
 }
