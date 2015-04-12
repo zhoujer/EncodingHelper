@@ -1,5 +1,6 @@
 // package edu.carleton.oshern;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class EncodingHelper {
@@ -133,7 +134,7 @@ public class EncodingHelper {
     }
 
     public static void processor(String in, String out, ArrayList d){
-        System.out.println(in + " " + out);
+        // System.out.println(in + " " + out);
         if(in.equals("string") || in.equals("none")){
             stringSubProcessor(d, out);
         }else if(in.equals("utf8")){
@@ -175,8 +176,8 @@ public class EncodingHelper {
 
     public static void utf8SubProcessor(ArrayList lst, String o){
         String byteString = lst.get(0).toString();
-        System.out.println(byteString);
-        byte[] byteArray = new byte[10];
+        // System.out.println(byteString);
+        byte[] byteArray = new byte[byteString.length() / 4];
         int counter = 0;
         for(int i=2; i < byteString.length(); i+=4){
             String subByteString = byteString.substring(i, i+2);
@@ -186,30 +187,114 @@ public class EncodingHelper {
                     & 0xFF);
             counter += 1;
         }
-        boolean determinant = true;
-        int Parser = 0;
-        while(determinant){
-            if((byteArray[Parser] & 0x80) != 0x80){
-                System.out.println("First case works");
-                
-                determinant = false;
-            }else if((byteArray[Parser] & 0xe0) == 0xc0){
-                System.out.println("Second case works");
-                determinant = false;
-            }else if((byteArray[Parser] & 0xf0) == 0xe0){
-                System.out.println("Third case works");
-                determinant = false;
-            }else if((byteArray[Parser] & 0xf8) == 0xf0){
-                System.out.println("Fourth case works");
-                determinant = false;
-            }else{
-                // throw an error
+
+        byte[][] doubleArray = doubleArrayGenerator(byteArray);
+//        for(int i=0; i < doubleArray.length; i++){
+//            System.out.println(Arrays.toString(doubleArray[i]));
+//        }
+
+        ArrayList<byte[]> newDoubleArray = new ArrayList<>(20);
+        for(int i=0; i < doubleArray.length; i++){
+            if(doubleArray[i] != null){
+                newDoubleArray.add(i, doubleArray[i]);
             }
         }
 
         if(o.equals("none")){
-
+            // System.out.println("Got here, in none section");
+            if(newDoubleArray.size() == 1){
+                EncodingHelperChar theCpEH = new EncodingHelperChar
+                        (newDoubleArray.get(0));
+                System.out.println("Character: " + Character.toString((char)
+                        theCpEH.getCodePoint()));
+                System.out.println("Codepoint: " + theCpEH.toCodePointString());
+                System.out.println("Name: " + theCpEH.getCharacterName());
+                System.out.println("UTF-8: " + theCpEH.toUtf8String());
+            }else{
+                String finalString = "";
+                String finalCodepoints = "";
+                String finalUTF8 = "";
+                for(int i = 0; i < newDoubleArray.size(); i++){
+                    EncodingHelperChar theCpEH = new EncodingHelperChar
+                            (newDoubleArray.get(i));
+                    finalCodepoints += theCpEH.toCodePointString() + " ";
+                    finalString += Character.toString((char)
+                            theCpEH.getCodePoint());
+                    finalUTF8 += theCpEH.toUtf8String();
+                }
+                System.out.println("String: " + finalString);
+                System.out.println("Codepoints: " + finalCodepoints);
+                System.out.println("UTF-8: " + finalUTF8);
+            }
+        }else if(o.equals("utf8")){
+            // TBD
+        }else if(o.equals("codepoint")) {
+            if (newDoubleArray.size() == 1) {
+                EncodingHelperChar theCpEH = new EncodingHelperChar
+                        (newDoubleArray.get(0));
+                System.out.println(theCpEH.toCodePointString());
+            }else{
+                String finalCodepoints = "";
+                for(int i = 0; i < newDoubleArray.size(); i++){
+                    EncodingHelperChar theCpEH = new EncodingHelperChar
+                            (newDoubleArray.get(i));
+                    finalCodepoints += theCpEH.toCodePointString() + " ";
+                }
+                System.out.println(finalCodepoints);
+            }
+        } else if(o.equals("string")){
+            if (newDoubleArray.size() == 1) {
+                EncodingHelperChar theCpEH = new EncodingHelperChar
+                        (newDoubleArray.get(0));
+                System.out.println(Character.toString((char)
+                        theCpEH.getCodePoint()));
+            }else{
+                String finalString = "";
+                for(int i = 0; i < newDoubleArray.size(); i++){
+                    EncodingHelperChar theCpEH = new EncodingHelperChar
+                            (newDoubleArray.get(i));
+                    finalString += Character.toString((char)
+                            theCpEH.getCodePoint());
+                }
+                System.out.println(finalString);
+            }
         }
+    }
+
+    public static byte[][] doubleArrayGenerator(byte[] b){
+        int parser = 0;
+        int tracker = 0;
+        byte[][] doubleArray = new byte[b.length][];
+        while(parser < b.length){
+            if((b[parser] & 0x80) != 0x80){
+                // System.out.println("First case works");
+                doubleArray[tracker] = Arrays.copyOfRange(b, parser,
+                        parser + 1);
+                tracker += 1;
+                parser += 1;
+            }else if((b[parser] & 0xe0) == 0xc0){
+                // System.out.println("Second case works");
+                doubleArray[tracker] = Arrays.copyOfRange(b, parser,
+                        parser + 2);
+                tracker += 1;
+                parser += 2;
+            }else if((b[parser] & 0xf0) == 0xe0){
+                // System.out.println("Third case works");
+                doubleArray[tracker] = Arrays.copyOfRange(b, parser,
+                        parser + 3);
+                tracker += 1;
+                parser += 3;
+            }else if((b[parser] & 0xf8) == 0xf0){
+                // System.out.println("Fourth case works");
+                doubleArray[tracker] = Arrays.copyOfRange(b, parser,
+                        parser + 4);
+                tracker += 1;
+                parser += 4;
+            }else{
+                // throw an error
+            }
+        }
+        return doubleArray;
     }
 
     public static void codepointSubProcessor(ArrayList lst, String o){
