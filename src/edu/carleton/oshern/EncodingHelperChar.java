@@ -1,4 +1,4 @@
-//package edu.carleton.oshern;
+package edu.carleton.oshern;
 import java.io.*;
 import java.util.*;
 
@@ -195,6 +195,7 @@ public class EncodingHelperChar {
         int codeLength = codePointString.length();
         String name = null;
         File file = new File("src/edu/carleton/oshern/unicode.txt");
+        //File file = new File("unicode.txt");
         try{
             Scanner scan = new Scanner (file);
             while (scan.hasNextLine() == true){
