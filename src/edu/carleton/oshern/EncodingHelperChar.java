@@ -206,7 +206,9 @@ public class EncodingHelperChar {
                     String[] pieces = line.split(";");
                     // System.out.println(Arrays.toString(pieces));
                     if (pieces[1].equals("<control>")){
-                        name = pieces[1] + " " + pieces[10];
+                        if(pieces.length >= 11){
+                            name = pieces[1] + " " + pieces[10];
+                        }
                         // System.out.println(name);
                     }else{
                         name = pieces[1];
