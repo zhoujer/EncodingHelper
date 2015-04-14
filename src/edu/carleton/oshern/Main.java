@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Main {
+
     public static void main(String[] args) {
 //        for(int i = 0; i < args.length; i++){
 //            System.out.println(args[i]);
@@ -56,6 +57,10 @@ public class Main {
         }
     }
 
+    /**
+     * Prints out a help message when called
+     * @return none (void)
+     */
     public static void help(){
         System.out.println("Welcome to EncodingHelper by Jerry Zhou and Nate " +
                 "Osher!");
@@ -80,6 +85,16 @@ public class Main {
                 " [examplestringhere]");
     }
 
+
+    /**Given an character and string k, function will print various statements on the command line
+     * based on k. The string k should be either "all", "cdp", "UTF-8", "u8" and based
+     * on k, the program prints either a summary (name, character, etc.) of the
+     * character, its codepoint, or its utf-8 encoding in hex. If function does
+     * not recognize k, it prints out an error message
+     *   For example charSummary("q","cdp") prints out the utf-8 encoding of q
+     *   which is "U+0071"
+     * @return none (void)
+    */
     public static void charSummary(char ch, String k){
         EncodingHelperChar sumChar = new EncodingHelperChar(ch);
         if(k.equals("all")){
@@ -92,10 +107,19 @@ public class Main {
         }else if(k.equals("u8")){
             System.out.println(sumChar.toUtf8String());
         }else{
-
+            System.out.println("Error within implementation of " +
+                    "Encoding helper - not user error ");
         }
     }
 
+    /**This functions prints statements on the command line based on two strings
+     * The inputString is the string which represents code point, character
+     * string, or utf-encoding in which the user typed in as input in the command line.
+     * The string k determines what will be printed on the command line
+     *      For example stringSummary("abc", "cdp") will result in
+     *       "U+0061 U+0061 U+0061" printing on the command line.
+     *  @return none (void)
+     */
     public static void stringSummary(String inputString, String k){
         char[] charray = inputString.toCharArray();
         if(k.equals("all")){
@@ -127,6 +151,10 @@ public class Main {
         }
     }
 
+    /**
+     * This function turns an Array of strings into a ArrayList of strings
+     * @return an ArrayList of the String[]
+     */
     public static ArrayList collector(String[] b, int j){
         ArrayList a = new ArrayList();
         for(int i = j; i < b.length; i++){
@@ -135,6 +163,19 @@ public class Main {
         return a;
     }
 
+    /**
+     * This function determines if the user typed in the correct input type.
+     * The input type refers to the string given after -i or -o in the command
+     * line such as "string", "utf8" etc. If user did not specify an input or
+     * output type, "none" is passed.
+     * If the user did not type in the correct input/output type, the function
+     * prints that there is an error on the command line and returns false.
+     * Otherwise, it returns true.
+     *      For example, if the user typed in the command line:
+     *          $> java EncodingHelper -i -wrongInputType input
+     *      validCommandInOut("wrongInputType","none") is passed which returns false
+     * @return boolean
+     */
     public static boolean validCommandInOut(String in, String out){
         if (in.equals("string")|in.equals("none")|in.equals("utf8")|in.equals("codepoint")){
             if (out.equals("string")|out.equals("none")|out.equals("utf8")|out.equals("codepoint")){
@@ -149,6 +190,22 @@ public class Main {
         }
     }
 
+    /**
+     * This function is the outer layer which determines the print statements
+     * that will eventually be printed on the command line.
+     * String in, String out refers to the input/output type which user typed i
+     * n after -i or -o. These parammeters are either "utf8","string","codepoint",
+     * or "none".
+     * ArrayList d refers to the sequence of strings, code points,etc. which the
+     * user wants to obtain information about.
+     * Based on the parameters another  processor function is called which
+     * determines the oupt based on the input
+     *      For example, processor("string","codepoint",["a","b","c"])
+     *      determines that the user wanted the array as a string and calls
+     *      stringOutProcessor("codepoint",["a","b","c"] ) which will print
+     *      the the array as code points on the command line.
+     * @return none (void)
+     */
     public static void processor(String in, String out, ArrayList d){
         // System.out.println(in + " " + out);
         if (validCommandInOut(in,out)) {
@@ -197,95 +254,103 @@ public class Main {
     public static void utf8OutProcessor(ArrayList lst, String o){
         String byteString = lst.get(0).toString();
         // System.out.println(byteString);
-        byteString = byteString.replace("\\", "").replace("x", "");
+        byteString = byteString.replace("\\", "").replace("x", "").replace(" ","").replace("X","");
         if(byteString.length() % 2 == 0){
             // UPDATE THIS
         }
         byte[] byteArray = new byte[byteString.length() / 2];
         // System.out.println(byteString);
+        boolean validByteArray = true;
         int counter = 0;
         for(int i=0; i < byteString.length(); i+=2){
             String subByteString = byteString.substring(i, i+2);
             // System.out.println(subByteString);
             // System.out.println(Integer.parseInt(subByteString, 16));
+            if (!validHexString(subByteString)){
+                System.out.println("Error - "+subByteString+" is not a valid utf8 byte");
+                validByteArray =false;
+                break;
+            }
             byteArray[counter] = (byte) (Integer.parseInt(subByteString, 16)
                     & 0xFF);
             counter += 1;
         }
 
-        byte[][] doubleArray = doubleArrayGenerator(byteArray);
-//        for(int i=0; i < doubleArray.length; i++){
-//            System.out.println(Arrays.toString(doubleArray[i]));
-//        }
+        if(validByteArray) {
+            byte[][] doubleArray = doubleArrayGenerator(byteArray);
+            //        for(int i=0; i < doubleArray.length; i++){
+            //            System.out.println(Arrays.toString(doubleArray[i]));
+            //        }
 
-        ArrayList<byte[]> newDoubleArray = new ArrayList<>(20);
-        for(int i=0; i < doubleArray.length; i++){
-            if(doubleArray[i] != null){
-                newDoubleArray.add(i, doubleArray[i]);
+            ArrayList<byte[]> newDoubleArray = new ArrayList<>(20);
+            for (int i = 0; i < doubleArray.length; i++) {
+                if (doubleArray[i] != null) {
+                    newDoubleArray.add(i, doubleArray[i]);
+                }
             }
-        }
 
-        if(o.equals("none")){
-            // System.out.println("Got here, in none section");
-            if(newDoubleArray.size() == 1){
-                EncodingHelperChar theCpEH = new EncodingHelperChar
-                        (newDoubleArray.get(0));
-                System.out.println("Character: " + Character.toString((char)
-                        theCpEH.getCodePoint()));
-                System.out.println("Codepoint: " + theCpEH.toCodePointString());
-                System.out.println("Name: " + theCpEH.getCharacterName());
-                System.out.println("UTF-8: " + theCpEH.toUtf8String());
-            }else{
-                String finalString = "";
-                String finalCodepoints = "";
-                String finalUTF8 = "";
-                for(int i = 0; i < newDoubleArray.size(); i++){
+            if (o.equals("none")) {
+                // System.out.println("Got here, in none section");
+                if (newDoubleArray.size() == 1) {
                     EncodingHelperChar theCpEH = new EncodingHelperChar
-                            (newDoubleArray.get(i));
-                    finalCodepoints += theCpEH.toCodePointString() + " ";
-                    finalString += Character.toString((char)
-                            theCpEH.getCodePoint());
-                    finalUTF8 += theCpEH.toUtf8String();
+                            (newDoubleArray.get(0));
+                    System.out.println("Character: " + Character.toString((char)
+                            theCpEH.getCodePoint()));
+                    System.out.println("Codepoint: " + theCpEH.toCodePointString());
+                    System.out.println("Name: " + theCpEH.getCharacterName());
+                    System.out.println("UTF-8: " + theCpEH.toUtf8String());
+                } else {
+                    String finalString = "";
+                    String finalCodepoints = "";
+                    String finalUTF8 = "";
+                    for (int i = 0; i < newDoubleArray.size(); i++) {
+                        EncodingHelperChar theCpEH = new EncodingHelperChar
+                                (newDoubleArray.get(i));
+                        finalCodepoints += theCpEH.toCodePointString() + " ";
+                        finalString += Character.toString((char)
+                                theCpEH.getCodePoint());
+                        finalUTF8 += theCpEH.toUtf8String();
+                    }
+                    System.out.println("String: " + finalString);
+                    System.out.println("Codepoints: " + finalCodepoints);
+                    System.out.println("UTF-8: " + finalUTF8);
                 }
-                System.out.println("String: " + finalString);
-                System.out.println("Codepoints: " + finalCodepoints);
-                System.out.println("UTF-8: " + finalUTF8);
-            }
-        }else if(o.equals("utf8")){
-            // TBD
-        }else if(o.equals("codepoint")) {
-            if (newDoubleArray.size() == 1) {
-                EncodingHelperChar theCpEH = new EncodingHelperChar
-                        (newDoubleArray.get(0));
-                System.out.println(theCpEH.toCodePointString());
-            }else{
-                String finalCodepoints = "";
-                for(int i = 0; i < newDoubleArray.size(); i++){
+            } else if (o.equals("utf8")) {
+                // TBD
+            } else if (o.equals("codepoint")) {
+                if (newDoubleArray.size() == 1) {
                     EncodingHelperChar theCpEH = new EncodingHelperChar
-                            (newDoubleArray.get(i));
-                    finalCodepoints += theCpEH.toCodePointString() + " ";
+                            (newDoubleArray.get(0));
+                    System.out.println(theCpEH.toCodePointString());
+                } else {
+                    String finalCodepoints = "";
+                    for (int i = 0; i < newDoubleArray.size(); i++) {
+                        EncodingHelperChar theCpEH = new EncodingHelperChar
+                                (newDoubleArray.get(i));
+                        finalCodepoints += theCpEH.toCodePointString() + " ";
+                    }
+                    System.out.println(finalCodepoints);
                 }
-                System.out.println(finalCodepoints);
-            }
-        } else if(o.equals("string")){
-            if (newDoubleArray.size() == 1) {
-                EncodingHelperChar theCpEH = new EncodingHelperChar
-                        (newDoubleArray.get(0));
-                System.out.println(Character.toString((char)
-                        theCpEH.getCodePoint()));
-            }else{
-                String finalString = "";
-                for(int i = 0; i < newDoubleArray.size(); i++){
+            } else if (o.equals("string")) {
+                if (newDoubleArray.size() == 1) {
                     EncodingHelperChar theCpEH = new EncodingHelperChar
-                            (newDoubleArray.get(i));
-                    finalString += Character.toString((char)
-                            theCpEH.getCodePoint());
+                            (newDoubleArray.get(0));
+                    System.out.println(Character.toString((char)
+                            theCpEH.getCodePoint()));
+                } else {
+                    String finalString = "";
+                    for (int i = 0; i < newDoubleArray.size(); i++) {
+                        EncodingHelperChar theCpEH = new EncodingHelperChar
+                                (newDoubleArray.get(i));
+                        finalString += Character.toString((char)
+                                theCpEH.getCodePoint());
+                    }
+                    System.out.println(finalString);
                 }
-                System.out.println(finalString);
+            } else {
+                String error = errorMsg("outputType");
+                System.out.println(error);
             }
-        }else{
-            String error = errorMsg("outputType");
-            System.out.println(error);
         }
     }
 

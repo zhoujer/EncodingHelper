@@ -226,6 +226,15 @@ public class EncodingHelperChar {
             return "<unknown> " + this.toCodePointString();
         }
     }
+
+    /**
+     * Generates a String error message depending on the string passed into
+     * the function
+     *   For example, errorMsg("codepointsize") returns " Error - codepoint
+     *   input is either too large or too small"
+     *
+     * @return a string for the the error message
+     */
     public static String errorMsg (String err){
         if (err.equals("codepointsize")){
             return "Error- codepoint input is " +
