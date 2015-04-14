@@ -194,7 +194,8 @@ public class EncodingHelperChar {
         // System.out.println(codePointString);
         int codeLength = codePointString.length();
         String name = null;
-        File file = new File("src/edu/carleton/oshern/unicode.txt");
+        File file = new File("edu/carleton/oshern/unicode" +
+                ".txt");
         //File file = new File("unicode.txt");
         try{
             Scanner scan = new Scanner (file);
@@ -220,7 +221,7 @@ public class EncodingHelperChar {
         if (name != null){
             return name;
         } else {
-            return "Error- character name not found";
+            return "<unknown> " + this.toCodePointString();
         }
     }
     public static String errorMsg (String err){
