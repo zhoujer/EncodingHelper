@@ -23,32 +23,42 @@ public class Main {
             // System.out.println("Got here !");
             // System.out.println(args[0]);
             if (args[0].equals("--output") || args[0].equals("-o")){
-                if (args[2].equals("--input") || args[2].equals("-i")){
+                if ((args.length > 3) && (args[2].equals("--input") || args[2]
+                        .equals
+                        ("-i"))){
                     // System.out.println("Got here 1");
                     String outputType = args[1];
                     String inputType = args[3];
                     ArrayList data = collector(args, 4);
                     processor(inputType, outputType, data);
-                }else{
+
+                }else if(args.length >= 3){
                     // System.out.println("Got here 2");
                     String outputType = args[1];
                     String inputType = "none";
                     ArrayList data = collector(args, 2);
                     processor(inputType, outputType, data);
+                }else{
+                    String error = errorMsg("arg");
+                    System.out.println(error);
                 }
             }else if (args[0].equals("--input") || args[0].equals("-i")){
-                if (args[2].equals("--output") || args[2].equals("-o")){
+                if ((args.length > 3) && (args[2].equals("--output") || args[2]
+                        .equals("-o"))){
                     // System.out.println("Got here 3");
                     String outputType = args[3];
                     String inputType = args[1];
                     ArrayList data = collector(args, 4);
                     processor(inputType, outputType, data);
-                }else{
+                }else if(args.length >= 3){
                     // System.out.println("Got here 4");
                     String inputType = args[1];
                     String outputType = "none";
                     ArrayList data = collector(args, 2);
                     processor(inputType, outputType, data);
+                }else{
+                    String error = errorMsg("arg");
+                    System.out.println(error);
                 }
             }else{
                 String error = errorMsg("arg");
@@ -222,6 +232,22 @@ public class Main {
         }
     }
 
+    /**
+     * Default processor for EncodingHelper.
+     *
+     * Processes the input of EncodingHelper if the user specifies
+     * that the type is string or does not specify an input type, and gives the
+     * output depending on the output
+     * that the user specifies. Default output is a summary.
+     *
+     * For example, if the user simply types:
+     * >$java EncodingHelper asdf
+     *
+     * It will output
+     * String: asdf
+     * Code Points: U+0061 U+0073 U+0064 U+0066
+     * UTF-8: \x61\x73\x64\x66
+     */
     public static void stringOutProcessor(ArrayList lst, String o){
         if(o.equals("none")){
             if (lst.get(0).toString().length() == 1){
@@ -251,12 +277,28 @@ public class Main {
         }
     }
 
+    /**
+     * Processes the input of EncodingHelper if the user specifies that it is
+     * in UTF-8 byte format. Output varies depending on whether or not the user
+     * specified an output type. Default output type is a summary.
+     *
+     * For example, if the user types:
+     *
+     * >$java EncodingHelper -i utf8 \x24
+     *
+     * It will output:
+     * Character: $
+     * Codepoint: U+0024
+     * Name: DOLLAR SIGN
+     * UTF-8: \x24
+     */
     public static void utf8OutProcessor(ArrayList lst, String o){
         String byteString = lst.get(0).toString();
         // System.out.println(byteString);
         byteString = byteString.replace("\\", "").replace("x", "").replace(" ","").replace("X","");
         if(byteString.length() % 2 == 0){
-            // UPDATE THIS
+            // UPDATE THIS UPDATE THIS UPDATE THIS UPDATE THIS
+            // DO IT DO IT DO IT DO IT DO IT DO IT
         }
         byte[] byteArray = new byte[byteString.length() / 2];
         // System.out.println(byteString);
@@ -354,6 +396,17 @@ public class Main {
         }
     }
 
+    /**
+     * Given an array of bytes, outputs a 2D array of UTF-8 byte arrays.
+     *
+     * For example, if the user passes in byte[] b = {0x24, 0xc2, 0xa2},
+     *
+     * It will return doubleArray =
+     * [0x24]
+     * [0xc2, 0xa2]
+     *
+     * @return 2 dimensional array of UTF-8 byte arrays
+     */
     public static byte[][] doubleArrayGenerator(byte[] b){
         int parser = 0;
         int tracker = 0;
@@ -390,7 +443,11 @@ public class Main {
         return doubleArray;
     }
 
-
+    /**
+     * Determines whether or not the input is a valid hexadecimal string
+     *
+     * @return boolean value (true if valid, false if not)
+     */
     public static  boolean  validHexString(String cpStr){
         if (cpStr == ""){
             return false;
@@ -408,6 +465,20 @@ public class Main {
         }
     }
 
+    /**
+     * Processes the input of EncodingHelper if the user specifies that the
+     * input type is codepoint. Output varies depending on whether or not the
+     * user specified an output type. Default output type is a summary.
+     *
+     * For example, if the user types:
+     *
+     * >$java EncodingHelper -i codepoint u0041 u0042 u0055
+     *
+     * It will output:
+     * String: ABU
+     * Codepoints: U+0041 U+0042 U+0055
+     * UTF-8: \x41\x42\x55
+     */
     public static void codepointOutProcessor(ArrayList lst, String o){
         String cpArray[] = cpArrayGetter(lst);
         //System.out.println(cpArray.length);
@@ -486,6 +557,15 @@ public class Main {
         }
     }
 
+    /**
+     * Takes an arraylist of codepoints in various formats and strips them down
+     * to just their hexadecimal values.
+     *
+     * For example, if it passed the arraylist {u0042, u+0024, \u0095}
+     * It outputs the array of strings cpArray = {0042, 0024, 0095}
+     *
+     * @return array of strings
+     */
     public static String[] cpArrayGetter(ArrayList l){
         String[] cpArray;
         if(l.size() == 1){
@@ -504,6 +584,18 @@ public class Main {
         return cpArray;
     }
 
+    /**
+     * Given a string input, returns the appropriate corresponding error
+     * message string
+     *
+     * For example, if we pass in the string "inputArg" it will return the
+     * string
+     *
+     * "Error - Incorrect input argument. Use: -i or --input"
+     * "\n Use -h on command line for help"
+     *
+     * @return Error message string
+     */
     public static String errorMsg (String err){
         if (err.equals("inputArg")){
             return "Error - Incorrect input argument. Use: -i or --input" +
