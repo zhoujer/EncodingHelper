@@ -22,32 +22,42 @@ public class Main {
             // System.out.println("Got here !");
             // System.out.println(args[0]);
             if (args[0].equals("--output") || args[0].equals("-o")){
-                if (args[2].equals("--input") || args[2].equals("-i")){
+                if ((args.length > 3) && (args[2].equals("--input") || args[2]
+                        .equals
+                        ("-i"))){
                     // System.out.println("Got here 1");
                     String outputType = args[1];
                     String inputType = args[3];
                     ArrayList data = collector(args, 4);
                     processor(inputType, outputType, data);
-                }else{
+
+                }else if(args.length >= 3){
                     // System.out.println("Got here 2");
                     String outputType = args[1];
                     String inputType = "none";
                     ArrayList data = collector(args, 2);
                     processor(inputType, outputType, data);
+                }else{
+                    String error = errorMsg("arg");
+                    System.out.println(error);
                 }
             }else if (args[0].equals("--input") || args[0].equals("-i")){
-                if (args[2].equals("--output") || args[2].equals("-o")){
+                if ((args.length > 3) && (args[2].equals("--output") || args[2]
+                        .equals("-o"))){
                     // System.out.println("Got here 3");
                     String outputType = args[3];
                     String inputType = args[1];
                     ArrayList data = collector(args, 4);
                     processor(inputType, outputType, data);
-                }else{
+                }else if(args.length >= 3){
                     // System.out.println("Got here 4");
                     String inputType = args[1];
                     String outputType = "none";
                     ArrayList data = collector(args, 2);
                     processor(inputType, outputType, data);
+                }else{
+                    String error = errorMsg("arg");
+                    System.out.println(error);
                 }
             }else{
                 String error = errorMsg("arg");
@@ -199,7 +209,8 @@ public class Main {
         // System.out.println(byteString);
         byteString = byteString.replace("\\", "").replace("x", "");
         if(byteString.length() % 2 == 0){
-            // UPDATE THIS
+            // UPDATE THIS UPDATE THIS UPDATE THIS UPDATE THIS
+            // DO IT DO IT DO IT DO IT DO IT DO IT
         }
         byte[] byteArray = new byte[byteString.length() / 2];
         // System.out.println(byteString);
@@ -324,7 +335,6 @@ public class Main {
         }
         return doubleArray;
     }
-
 
     public static  boolean  validHexString(String cpStr){
         if (cpStr == ""){
